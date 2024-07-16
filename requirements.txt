@@ -1,3 +1,4 @@
 streamlit
 pandas
 youtube_comment_downloader
+matplotlib.pyplot
