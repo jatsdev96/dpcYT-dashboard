@@ -18,6 +18,7 @@ st.set_page_config(
     page_title='DPCYT dashboard',
     page_icon=':computer:', # This is an emoji shortcode. Could be a URL too.
 )
+st.set_option('deprecation.showPyplotGlobalUse', False)
 
 # Draw the actual page
 
@@ -47,7 +48,7 @@ if url:
     #         writer.writerow([comment['cid'], comment['text'], comment['time'], comment['author'], comment['channel'], comment['votes'], comment['replies'], comment['photo'], comment['heart'], comment['reply'], comment['time_parsed']])
 
 else:
-    st.write("vacio")
+    st.write("")
 
 df = pd.read_csv('comentarios.csv')
 
