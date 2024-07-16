@@ -2,3 +2,8 @@ streamlit
 pandas
 youtube_comment_downloader
 matplotlib
+seaborn 
+numpy 
+textblob
+itertools 
+textblob   
