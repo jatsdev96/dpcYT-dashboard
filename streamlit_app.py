@@ -16,9 +16,7 @@ st.set_page_config(
 def get_gdp_data():
     """Grab GDP data from a CSV file.
 
-    This uses caching to avoid having to read the file every time. If we were
-    reading from an HTTP endpoint instead of a file, it's a good idea to set
-    a maximum age to the cache with the TTL argument: @st.cache_data(ttl='1d')
+    The YouTube Comment Analyzer is a web application designed to receive a YouTube video link and analyze the comments associated with the video. The app processes and classifies the comments based on various criteria such as sentiment (positive, negative, neutral), topics, and key phrases. It provides users with insightful visualizations and reports to understand the overall sentiment and common themes within the comment section, helping content creators and marketers make informed decisions based on audience feedback.
     """
 
     # Instead of a CSV on disk, you could read from an HTTP endpoint here too.
