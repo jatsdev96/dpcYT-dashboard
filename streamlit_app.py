@@ -18,7 +18,7 @@ st.set_page_config(
     page_title='DPCYT dashboard',
     page_icon=':computer:', # This is an emoji shortcode. Could be a URL too.
 )
-st.set_option('deprecation.showPyplotGlobalUse', False)
+#st.set_option('deprecation.showPyplotGlobalUse', False)
 
 # Draw the actual page
 
