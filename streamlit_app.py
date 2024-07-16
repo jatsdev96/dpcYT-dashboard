@@ -66,16 +66,35 @@ df['subobj']=df['text'].apply(lambda x: TextBlob(x).sentiment.subjectivity)
 st.write(df['polaridad'].describe())
 st.write(df['subobj'].describe())
 
-plt.figure(figsize=(15, 6))
+# plt.figure(figsize=(15, 6))
 
-sns.histplot(df['polaridad'], color='skyblue', label='Polaridad')
-sns.histplot(df['subobj'], color='orange', label='Subjetividad')
+# sns.histplot(df['polaridad'], color='skyblue', label='Polaridad')
+# sns.histplot(df['subobj'], color='orange', label='Subjetividad')
 
-plt.xlabel('Valores')
-plt.ylabel('Frecuencia')
-plt.yscale('log')
-plt.title('Distribución de Polaridad y Subjetividad de los comentarios')
-plt.legend()
-plt.ylim(-1, 10000)
-st.pyplot(plt.show())
+# plt.xlabel('Valores')
+# plt.ylabel('Frecuencia')
+# plt.yscale('log')
+# plt.title('Distribución de Polaridad y Subjetividad de los comentarios')
+# plt.legend()
+# plt.ylim(-1, 10000)
+# plt.show()
+
+st.write(df.head())
+
+fig, ax = plt.subplots(figsize=(15, 6))
+
+# Crear los histogramas
+sns.histplot(df['polaridad'], color='skyblue', label='Polaridad', ax=ax)
+sns.histplot(df['subobj'], color='orange', label='Subjetividad', ax=ax)
+
+# Configurar etiquetas y título
+ax.set_xlabel('Valores')
+ax.set_ylabel('Frecuencia')
+ax.set_yscale('log')
+ax.set_title('Distribución de Polaridad y Subjetividad de los comentarios')
+ax.legend()
+ax.set_ylim(-1, 10000)
+
+# Mostrar la figura en Streamlit
+st.pyplot(fig)
 
