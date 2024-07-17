@@ -6,3 +6,5 @@ seaborn
 numpy 
 textblob
 scikit-learn
+nltk
+regex

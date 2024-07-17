@@ -1,5 +1,6 @@
 import streamlit as st
 import pandas as pd
+import regex as re
 import math
 from pathlib import Path
 import csv
@@ -13,6 +14,9 @@ from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import roc_auc_score, f1_score, confusion_matrix
 from sklearn.model_selection import train_test_split
 from textblob import TextBlob
+import nltk
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
 # Set the title and favicon that appear in the Browser's tab bar.
 st.set_page_config(
     page_title='DPCYT dashboard',
@@ -37,6 +41,7 @@ url = st.text_input("URL video",)
 
 if url:
     st.write("no vacio")
+    # st.video("url")
     # downloader = YoutubeCommentDownloader()
     # comments = downloader.get_comments_from_url(url, sort_by=SORT_BY_POPULAR)
 
@@ -49,6 +54,8 @@ if url:
 
 else:
     st.write("")
+
+st.write("Análisis de sentimiento:")
 
 df = pd.read_csv('comentarios.csv')
 
@@ -79,7 +86,7 @@ st.write(df['subobj'].describe())
 # plt.ylim(-1, 10000)
 # plt.show()
 
-st.write(df.head())
+#st.write(df.head())
 
 fig, ax = plt.subplots(figsize=(15, 6))
 
@@ -97,4 +104,80 @@ ax.set_ylim(-1, 10000)
 
 # Mostrar la figura en Streamlit
 st.pyplot(fig)
+#st.bar_chart(fig)
 
+
+# Configura el tema de Seaborn
+sns.set_theme(style="ticks")
+
+# Crea la figura del jointplot
+g = sns.jointplot(x='votes', y='polaridad', data=df, kind='scatter', color='red', height=10)
+g.set_axis_labels('Votos', 'polaridad')
+g.fig.suptitle('Distribución Conjunta de Votos y polaridad de los comentarios', fontsize=14)
+
+# Ajusta la escala del eje x
+g.ax_joint.set_xscale('log')
+
+# Ajusta la figura para que el título no se sobreponga con los ejes
+plt.subplots_adjust(top=0.95)
+
+# Muestra la gráfica en Streamlit
+st.pyplot(g.fig)
+
+# Configura el tema de Seaborn
+sns.set_theme(style="ticks")
+
+# Crea la figura del jointplot
+g = sns.jointplot(x='votes', y='subobj', data=df, kind='scatter', color='blue', height=10)
+g.set_axis_labels('Votos', 'objetividad')
+g.fig.suptitle('Distribución Conjunta de Votos y objetividad', fontsize=14)
+
+# Ajusta la escala del eje x
+g.ax_joint.set_xscale('log')
+
+# Ajusta la figura para que el título no se sobreponga con los ejes
+plt.subplots_adjust(top=0.95)
+
+# Muestra la gráfica en Streamlit
+st.pyplot(g.fig)
+
+st.write("Primeras diez filas del DataFrame:")
+st.write(df[0:10])
+
+st.write("Nuevo procesado:")
+
+# Elimina emojis
+df_cleaned = df.copy()
+df_cleaned['text'] = df_cleaned['text'].str.replace('[^\w\s#@/:%.,_-]', '', flags=re.UNICODE)
+
+# Carga las stopwords en español
+nltk.download('stopwords')
+stop_words = set(stopwords.words('spanish'))
+
+# Función para eliminar stopwords
+def preprocess_text(text):
+    tokens = word_tokenize(text.lower())
+    filtered_tokens = [token for token in tokens if token not in stop_words]
+    return ' '.join(filtered_tokens)
+
+# Aplica el preprocesamiento a la columna 'text' en el nuevo DataFrame
+df_cleaned['processed_text'] = df_cleaned['text'].apply(preprocess_text)
+
+# Tokeniza cada comentario y guarda los tokens en una nueva columna 'tokens'
+df_cleaned['tokens'] = df_cleaned['processed_text'].apply(word_tokenize)
+
+# Ahora puedes acceder a la columna 'tokens' en el DataFrame 'df_cleaned'
+
+df_cleaned = df_cleaned.drop(columns=['channel','cid','time', 'photo','heart', 'reply',	'time_parsed','author','processed_text' ])
+st.write("Primeras diez filas del DataFrame:")
+st.write(df_cleaned[0:10])
+
+df_cleaned['NumCom'] = range(1, len(df_cleaned) + 1)
+df_comentarios = df_cleaned
+df_cleaned = df_cleaned.drop(columns=['text','votes','replies', 'polaridad', 'subobj'])
+st.write("Primeras diez filas del DataFrame:")
+st.write(df_cleaned[0:10])
+#df_cleaned[0:5]
+
+df_tokens_cap = df_cleaned.explode(column='tokens')
+df_tokens_cap
