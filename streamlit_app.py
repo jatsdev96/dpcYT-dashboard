@@ -239,14 +239,14 @@ st.pyplot(fig)
 wordcloud = WordCloud().generate(' '.join(tokens))
 
 # Configura la visualización de la nube de palabras
-plt.figure(figsize=(10, 6))
-plt.imshow(wordcloud, interpolation='bilinear')
-plt.axis("off")
-plt.title("Nube de Palabras")
+fig, ax = plt.subplots(figsize=(10, 6))
+ax.imshow(wordcloud, interpolation='bilinear')
+ax.axis("off")
+ax.set_title("Nube de Palabras")
 plt.tight_layout()
 
 # Muestra la imagen en Streamlit
-st.image(wordcloud.to_array())
+st.pyplot(fig)
 
 st.write("Análisis de sentimientos:")
 
