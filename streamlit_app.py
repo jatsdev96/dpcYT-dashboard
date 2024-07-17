@@ -1,6 +1,7 @@
 import streamlit as st
 import pandas as pd
-import regex as re
+#import regex as re
+import re
 import math
 from pathlib import Path
 import csv
