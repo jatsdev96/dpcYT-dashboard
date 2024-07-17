@@ -169,6 +169,9 @@ ComYT_filtrado1 = list(filter(None, ComYT_sp))
 
 #Aqui inicia el procesado de datos
 
+nltk.download('stopwords')
+nltk.download('punkt')
+
 def eliminar_emojis(texto):
     emoji_pattern = re.compile("["
                            u"\U0001F600-\U0001F64F"  # emoticones
