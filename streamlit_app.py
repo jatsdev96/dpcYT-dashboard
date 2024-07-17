@@ -147,13 +147,24 @@ st.write(df[0:10])
 
 st.write("Nuevo procesado:")
 
+
+# Asegúrate de que los datos necesarios están descargados
+try:
+    nltk.data.find('tokenizers/punkt')
+except LookupError:
+    nltk.download('punkt')
+
+nltk.download('stopwords')
+stop_words = set(stopwords.words('spanish'))
+
+
 # Elimina emojis
 df_cleaned = df.copy()
 df_cleaned['text'] = df_cleaned['text'].str.replace('[^\w\s#@/:%.,_-]', '', flags=re.UNICODE)
 
-# Carga las stopwords en español
-nltk.download('stopwords')
-stop_words = set(stopwords.words('spanish'))
+# # Carga las stopwords en español
+# nltk.download('stopwords')
+# stop_words = set(stopwords.words('spanish'))
 
 # Función para eliminar stopwords
 def preprocess_text(text):
