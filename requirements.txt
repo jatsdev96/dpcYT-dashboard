@@ -8,3 +8,4 @@ textblob
 scikit-learn
 nltk
 regex
+wordcloud

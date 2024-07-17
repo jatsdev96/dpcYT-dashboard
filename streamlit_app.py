@@ -18,6 +18,8 @@ from textblob import TextBlob
 import nltk
 from nltk.corpus import stopwords
 from nltk.tokenize import word_tokenize
+from nltk.stem.snowball import SnowballStemmer
+from wordcloud import WordCloud
 # Set the title and favicon that appear in the Browser's tab bar.
 st.set_page_config(
     page_title='DPCYT dashboard',
@@ -143,14 +145,123 @@ plt.subplots_adjust(top=0.95)
 # Muestra la gráfica en Streamlit
 st.pyplot(g.fig)
 
+st.write("Identificación y procesado del procesado de texto:")
+df['text'] = df['text'].astype(str)
+ComYT = df['text']
+ComYT[0:10]
+
+
+
+# Supongamos que df['text'] es tu Serie de pandas con los párrafos
+ComYT = df['text'].astype(str)
+
+# Inicializa una cadena vacía para almacenar todo el texto
+ComYTcom = ''
+
+for parrafo in ComYT:
+    ComYTcom += parrafo + '\r'
+
+ComYT_sp = ComYTcom.split("\n")
+#ComYT_sp[:20]
+
+ComYT_filtrado1 = list(filter(None, ComYT_sp))
+#ComYT_filtrado1[:20]
+
+#Aqui inicia el procesado de datos
+
+def eliminar_emojis(texto):
+    emoji_pattern = re.compile("["
+                           u"\U0001F600-\U0001F64F"  # emoticones
+                           u"\U0001F300-\U0001F5FF"  # símbolos & pictogramas
+                           u"\U0001F680-\U0001F6FF"  # transporte & símbolos de mapas
+                           u"\U0001F1E0-\U0001F1FF"  # banderas (iOS)
+                           u"\U00002702-\U000027B0"
+                           u"\U000024C2-\U0001F251"
+                           "]+", flags=re.UNICODE)
+    return emoji_pattern.sub(r'', texto)
+
+def tokens(txt):
+    ComYT_limpio = eliminar_emojis(txt)
+    ComYT_limpio = re.sub(r'[^\w\s]', '', txt.lower())
+
+    stop_words = set(stopwords.words('spanish'))## filtramos stordswords
+    tokens = word_tokenize(ComYT_limpio)
+
+    stemmer = SnowballStemmer('spanish') # filtrado de Stemmer /desidencia
+    ComYT_filtrado = [stemmer.stem(word) for word in tokens if word not in stop_words]
+    ComYT_filtrado = [word for word in tokens if word not in stop_words]
+    return ComYT_filtrado
+
+map(tokens, ComYT_filtrado1)
+#map
+
+map_ComYT = list(map(tokens, ComYT_filtrado1))
+
+tokens = []
+for token in map_ComYT:
+    tokens.extend(token)
+
+df = pd.DataFrame(tokens)
+conteo_frecuencias = df.value_counts()
+conteo_frecuencias
+
+df_frecuencias = conteo_frecuencias.to_frame()
+df_frecuencias
+
+df_frecuencias.reset_index(inplace = True)
+df_frecuencias.columns = ['token', 'conteo']
+df_frecuencias
+
+df_frecuencias.head(30)
+
+st.write("Top 20 Palabras más Frecuentes:")
+st.write(df_frecuencias.head(20))
+
+# Crea la figura de la gráfica de barras
+fig, ax = plt.subplots(figsize=(10, 6))
+ax.bar(df_frecuencias.iloc[:20]['token'], df_frecuencias.iloc[:20]['conteo'])
+
+# Personaliza las etiquetas del eje X
+plt.xticks(rotation=45, ha='right')
+
+ax.set_xlabel('Palabras')
+ax.set_ylabel('Frecuencia')
+ax.set_title('Top 20 Palabras más Frecuentes')
+plt.tight_layout()
+
+# Muestra la gráfica en Streamlit
+st.pyplot(fig)
+
+# Genera la nube de palabras
+wordcloud = WordCloud().generate(' '.join(tokens))
+
+# Configura la visualización de la nube de palabras
+plt.figure(figsize=(10, 6))
+plt.imshow(wordcloud, interpolation='bilinear')
+plt.axis("off")
+plt.title("Nube de Palabras")
+plt.tight_layout()
+
+# Muestra la imagen en Streamlit
+st.image(wordcloud.to_array())
+
 st.write("Análisis de sentimientos:")
+
+df = pd.read_csv('comentarios.csv')
+
+df['new_column'] = 1
+df.loc[df['votes'].str.contains('K'), 'new_column'] = 1000
+df['votes'] = df['votes'].str.replace('K', '')
+df['votes'] = df['votes'].astype(float)
+df['votes'] = df['votes'] * df['new_column']
+df.drop(columns=['new_column'], inplace=True)
+df['votes'] = df['votes'].replace(0, np.nan)
+df['votes'] = df['votes'].replace(' ', np.nan)
+
 df['polaridad']=df['text'].apply(lambda x: TextBlob(x).sentiment.polarity)
 df['subobj']=df['text'].apply(lambda x: TextBlob(x).sentiment.subjectivity) 
 st.write(df['polaridad'].describe())
 st.write(df['subobj'].describe())
-
-
-
 # plt.figure(figsize=(15, 6))
 
 # sns.histplot(df['polaridad'], color='skyblue', label='Polaridad')
