@@ -56,8 +56,8 @@ if url:
 else:
     st.write("")
 
-st.write("Análisis de sentimiento:")
-
+#st.write("Análisis de sentimiento:")
+#Preparación de datos
 df = pd.read_csv('comentarios.csv')
 
 df['new_column'] = 1
@@ -69,10 +69,64 @@ df.drop(columns=['new_column'], inplace=True)
 df['votes'] = df['votes'].replace(0, np.nan)
 df['votes'] = df['votes'].replace(' ', np.nan)
 
+st.write("Descripción de datos:")
+st.write("Estadísticos básicos:")
+st.write(df.describe())
+st.write("Estadísticos de autores:")
+st.write(df['author'].describe())
+st.write("===============================")
+st.write(df['author'].value_counts())
+
+st.write("Top 10 autores:")
+top_10_autores = df['author'].value_counts().nlargest(10)
+# Crea la figura de la gráfica de barras
+fig, ax = plt.subplots(figsize=(10, 6))
+ax.bar(top_10_autores.index, top_10_autores.values)
+ax.set_xlabel('Autores')
+ax.set_ylabel('Frecuencia')
+ax.set_title('Top 10 Autores')
+ax.set_xticks(range(len(top_10_autores.index)))
+ax.set_xticklabels(top_10_autores.index, rotation=45, ha='right')
+plt.tight_layout()
+
+# Muestra la gráfica en Streamlit
+st.pyplot(fig)
+
+st.write("Top 10 autores con más votos:")
+top_autores_votos = df.groupby('author')['votes'].sum().nlargest(10)
+fig, ax = plt.subplots(figsize=(10, 6))
+ax.bar(top_autores_votos.index, top_autores_votos.values)
+ax.set_xlabel('Autores')
+ax.set_ylabel('Total de Votos')
+ax.set_title('Top 10 Autores con Más Votos')
+ax.set_xticks(range(len(top_autores_votos.index)))
+ax.set_xticklabels(top_autores_votos.index, rotation=45, ha='right')
+plt.tight_layout()
+
+# Muestra la gráfica en Streamlit
+st.pyplot(fig)
+
+st.write("Top 10 autores con más réplicas:")
+top_autores_replicas = df.groupby('author')['replies'].sum().nlargest(10)
+fig, ax = plt.subplots(figsize=(10, 6))
+ax.bar(top_autores_replicas.index, top_autores_replicas.values)
+ax.set_xlabel('Autores')
+ax.set_ylabel('Total de Réplicas')
+ax.set_title('Top 10 Autores con Más Réplicas')
+ax.set_xticks(range(len(top_autores_replicas.index)))
+ax.set_xticklabels(top_autores_replicas.index, rotation=45, ha='right')
+plt.tight_layout()
+
+# Muestra la gráfica en Streamlit
+st.pyplot(fig)
+
+st.write("Análisis de sentimientos:")
 df['polaridad']=df['text'].apply(lambda x: TextBlob(x).sentiment.polarity)
 df['subobj']=df['text'].apply(lambda x: TextBlob(x).sentiment.subjectivity) 
 st.write(df['polaridad'].describe())
 st.write(df['subobj'].describe())
+
+
 
 # plt.figure(figsize=(15, 6))
 
