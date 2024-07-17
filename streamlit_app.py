@@ -120,6 +120,29 @@ plt.tight_layout()
 # Muestra la gráfica en Streamlit
 st.pyplot(fig)
 
+st.write("Estadísticos de votos:")
+st.write(df['votes'].describe())
+st.write(df['votes'].value_counts())
+st.write("Estadísticos de replicas:")
+st.write(df['replies'].describe())
+st.write(df['replies'].value_counts())
+st.write("Distribución conjunta de Votos y Réplicas:")
+sns.set_theme(style="ticks")
+
+# Crea la figura del jointplot
+g = sns.jointplot(x='votes', y='replies', data=df, kind='scatter', palette="rocket", height=10)
+g.set_axis_labels('Votos', 'Réplicas')
+g.fig.suptitle('Distribución Conjunta de Votos y Réplicas', fontsize=14)
+
+# Ajusta la escala del eje x
+g.ax_joint.set_xscale('log')
+
+# Ajusta la figura para que el título no se sobreponga con los ejes
+plt.subplots_adjust(top=0.95)
+
+# Muestra la gráfica en Streamlit
+st.pyplot(g.fig)
+
 st.write("Análisis de sentimientos:")
 df['polaridad']=df['text'].apply(lambda x: TextBlob(x).sentiment.polarity)
 df['subobj']=df['text'].apply(lambda x: TextBlob(x).sentiment.subjectivity) 
